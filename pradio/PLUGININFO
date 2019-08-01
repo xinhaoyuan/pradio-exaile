@@ -1,0 +1,5 @@
+Version='0.1.0'
+Authors=['Xinhao Yuan <xinhaoyuan@gmail.com>']
+Name=_('PRadio')
+Description=_('PRadio frontend in exaile')
+Category=_('Media Sources')
