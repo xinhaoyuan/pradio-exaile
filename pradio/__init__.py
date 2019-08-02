@@ -16,6 +16,7 @@ from xlgui.panel import radio
 import subprocess
 import json
 import sys
+import logging
 
 STATION = None
 
@@ -40,11 +41,13 @@ def set_status(message, timeout=0):
     radio.set_status(message, timeout)
 
 def get_next_track_from_proc(proc, channel_id):
+    line = None
     try:
         proc.stdin.write(json.dumps({ "type" : "cmd_next", "channel_id" : channel_id }).encode("utf-8"))
         proc.stdin.write(b"\n")
         proc.stdin.flush()
-        resp = json.loads(proc.stdout.readline().decode("utf-8"))
+        line = proc.stdout.readline()
+        resp = json.loads(line.decode("utf-8"))
         assert(resp["type"] == "reply_ok")
         assert("data" in resp)
         assert("url" in resp["data"])
@@ -66,22 +69,24 @@ def get_next_track_from_proc(proc, channel_id):
         tr.set_tags(**tags)
         return tr
     except Exception as e:
-        print("Got error playing next song: %s" % repr(e))
+        logging.exception("Got error playing next song: %s" % line)
         return None
     pass
 
 def get_channel_lists_from_proc(proc):
+    line = None
     try:
         proc.stdin.write(json.dumps({ "type" : "cmd_list_channels" }).encode("utf-8"))
         proc.stdin.write(b"\n")
         proc.stdin.flush()
-        resp = json.loads(proc.stdout.readline().decode("utf-8"))
+        line = proc.stdout.readline()
+        resp = json.loads(line.decode("utf-8"))
         assert(resp["type"] == "reply_ok")
         assert("channels" in resp)
 
         return resp["channels"]
     except Exception as e:
-        print("Got error getting channel list: %s" % repr(e))
+        logging.exception("Got error getting channel list: %s" % line)
         return []
     pass
 
