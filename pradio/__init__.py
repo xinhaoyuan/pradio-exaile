@@ -111,10 +111,18 @@ class PRadioList(RadioList):
 
     def proc(self):
         if self._proc is None:
+            try:
+                si = subprocess.STARTUPINFO()
+                si.dwFlags = subprocess.STARTF_USESHOWWINDOW
+            except:
+                si = None
+                pass
+
             self._proc = subprocess.Popen(
                 self._cmd,
                 stdin = subprocess.PIPE,
-                stdout = subprocess.PIPE)
+                stdout = subprocess.PIPE,
+                startupinfo = si)
             pass
         return self._proc
 
